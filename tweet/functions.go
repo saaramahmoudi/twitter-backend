@@ -1,4 +1,4 @@
-package user
+package tweet
 
 //import (
 //	"github.com/saaramahmoudi/twitter-backend/user/internal/core/service"
