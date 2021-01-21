@@ -12,8 +12,8 @@ type tweetApi struct {
 }
 
 var NewTweet = domain.NewTweet
-type MediaType domain.MediaType
-type Tweet domain.Tweet
+type MediaType = domain.MediaType
+type Tweet = domain.Tweet
 var Api = tweetApi{service.TweetService{Repo :repositories.TweetFirestore{}}}
 
 
