@@ -2,7 +2,7 @@ package main
 
 import (
 	tweet2 "github.com/saaramahmoudi/twitter-backend/tweet"
-	"github.com/saaramahmoudi/twitter-backend/tweet/pkg/core/domain"
+	"github.com/saaramahmoudi/twitter-backend/tweet/internal/core/domain"
 	"log"
 )
 

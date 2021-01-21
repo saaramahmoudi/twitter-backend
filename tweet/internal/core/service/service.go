@@ -1,8 +1,8 @@
 package service
 
 import (
+	"github.com/saaramahmoudi/twitter-backend/tweet/internal/core/domain"
 	"github.com/saaramahmoudi/twitter-backend/tweet/internal/core/ports"
-	"github.com/saaramahmoudi/twitter-backend/tweet/pkg/core/domain"
 )
 
 // The second most inner impl
@@ -43,7 +43,7 @@ func (t TweetService) Update(id * string, tweet *domain.Tweet) (*domain.Tweet, e
 	return tweet, nil
 }
 
-func (t TweetService) Create(Text * string, Media * domain.MediaType) (*domain.Tweet, error){
+func (t TweetService) Create(Text * string, Media *domain.MediaType) (*domain.Tweet, error){
 	id, err := t.Repo.GetNewId()
 	if err != nil{
 		return nil, err

@@ -4,7 +4,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"context"
 	"errors"
-	"github.com/saaramahmoudi/twitter-backend/tweet/pkg/core/domain"
+	"github.com/saaramahmoudi/twitter-backend/tweet/internal/core/domain"
 
 	//"errors"
 	firebase "firebase.google.com/go"
