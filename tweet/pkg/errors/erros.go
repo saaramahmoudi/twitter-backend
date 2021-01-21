@@ -3,7 +3,7 @@ package errors
 
 
 
-type UserErrors struct{
+type TweetErrors struct{
 	Message string `json:"message"`
 }
 
