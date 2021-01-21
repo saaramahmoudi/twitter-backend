@@ -1,8 +1,8 @@
 package main
 
 import (
+	tweet2 "github.com/saaramahmoudi/twitter-backend/tweet"
 	"github.com/saaramahmoudi/twitter-backend/tweet/pkg/core/domain"
-	"github.com/saaramahmoudi/twitter-backend/tweet/pkg/tweet"
 	"log"
 )
 
@@ -10,7 +10,7 @@ func main(){
 
 	// Test creating
 	text := "Something #new"
-	tweetInstance, err := tweet.TweetApi.Create(&text, nil)
+	tweetInstance, err := tweet2.Api.Create(&text, nil)
 
 	if err != nil {
 		log.Fatal(err)
@@ -20,13 +20,13 @@ func main(){
 	still := true
 	tweetInstance.Media = &domain.MediaType{MediaSrc: &add,  IsStill: &still}
 
-	tweetInstance, err = tweet.TweetApi.Update(tweetInstance.ID, tweetInstance)
+	tweetInstance, err = tweet2.Api.Update(tweetInstance.ID, tweetInstance)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = tweet.TweetApi.Delete(tweetInstance)
+	err = tweet2.Api.Delete(tweetInstance)
 
 	if err != nil {
 		log.Fatal(err)
