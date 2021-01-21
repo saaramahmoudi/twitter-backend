@@ -1,4 +1,4 @@
-package handler
+package tweet
 
 import (
 	"github.com/saaramahmoudi/twitter-backend/tweet/internal/core/ports"
