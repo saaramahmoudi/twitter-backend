@@ -1,11 +1,16 @@
 package ports
 
-import "github.com/saaramahmoudi/twitter-backend/tweet/internal/core/domain"
+import (
+	"github.com/saaramahmoudi/twitter-backend/tweet/pkg/core/domain"
+)
 
 type TweetRepository interface {
 	//Save(Text string, Media domain.MediaType) (*domain.Tweet, error)
-	GetTweet(id string) (* domain.Tweet, error)
-	UpdateTweet(user * domain.Tweet) (* domain.Tweet, error)
+	GetTweet(id * string) (*domain.Tweet, error)
+	UpdateTweet(user *domain.Tweet) (*domain.Tweet, error)
+	Save(tweet *domain.Tweet) (*domain.Tweet, error)
+	Delete(tweet *domain.Tweet) error
+	GetNewId() (*string, error)
 }
 
 

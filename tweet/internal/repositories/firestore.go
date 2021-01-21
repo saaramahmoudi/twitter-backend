@@ -3,7 +3,8 @@ package repositories
 import (
 	"cloud.google.com/go/firestore"
 	"context"
-	"github.com/saaramahmoudi/twitter-backend/tweet/internal/core/domain"
+	"errors"
+	"github.com/saaramahmoudi/twitter-backend/tweet/pkg/core/domain"
 
 	//"errors"
 	firebase "firebase.google.com/go"
@@ -24,9 +25,9 @@ var app *firebase.App
 //
 //}
 
-func (tf TweetFirestore) GetTweet(id string) (* domain.Tweet, error) {
+func (tf TweetFirestore) GetTweet(id * string) (*domain.Tweet, error) {
 	res := &domain.Tweet{}
-	doc, err := client.Collection(CollectionAddress).Doc(id).Get(ctx)
+	doc, err := client.Collection(CollectionAddress).Doc(*id).Get(ctx)
 	if err != nil{
 		log.Println(err)
 		return nil, err
@@ -39,7 +40,7 @@ func (tf TweetFirestore) GetTweet(id string) (* domain.Tweet, error) {
 
 	return res, nil
 }
-func (tf TweetFirestore) UpdateTweet(tweet * domain.Tweet) (* domain.Tweet, error) {
+func (tf TweetFirestore) UpdateTweet(tweet *domain.Tweet) (*domain.Tweet, error) {
 	_, err := client.Collection(CollectionAddress).Doc(*tweet.ID).Set(ctx, tweet)
 	if err != nil{
 		log.Println(err)
@@ -48,6 +49,26 @@ func (tf TweetFirestore) UpdateTweet(tweet * domain.Tweet) (* domain.Tweet, erro
 	return tweet, nil
 }
 
+
+func (tf TweetFirestore) Save(tweet *domain.Tweet) (*domain.Tweet, error){
+	if tweet.ID == nil {
+		return nil, errors.New("Tweet ID was not set")
+	}
+	return tf.UpdateTweet(tweet)
+}
+func (tf TweetFirestore) GetNewId() (* string, error){
+	ref := client.Collection(CollectionAddress).NewDoc()
+	if ref.ID == ""{
+		return nil, errors.New("Could not create a new tweet")
+	}
+	return &ref.ID, nil
+}
+
+
+func (tf TweetFirestore) Delete(tweet *domain.Tweet) error{
+	_, err := client.Collection(CollectionAddress).Doc(*tweet.ID).Delete(ctx)
+	return err
+}
 
 func init(){
 	var err error
