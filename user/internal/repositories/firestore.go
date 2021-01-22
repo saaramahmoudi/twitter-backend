@@ -3,6 +3,7 @@ package repositories
 import (
 	"cloud.google.com/go/firestore"
 	"context"
+	"encoding/json"
 	"errors"
 	firebase "firebase.google.com/go"
 	"github.com/saaramahmoudi/twitter-backend/user/internal/core/domain"
@@ -17,9 +18,21 @@ type UserFirestore struct{
 var client *firestore.Client
 var ctx = context.Background()
 var app *firebase.App
-
-func (repo UserFirestore) Get(email string) (*domain.User, error){
-	doc, err := client.Collection("UserProfile").Doc(email).Get(ctx)
+// This is used because it seems that the gcp firestore library does not use json tags correctly for creating documents
+func turnStructToMap(input interface{}) (map[string]interface{}, error) {
+	bytes, err := json.Marshal(&input)
+	if err != nil {
+		return nil, err
+	}
+	var res map[string]interface{}
+	err = json.Unmarshal(bytes, &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+func (repo UserFirestore) Get(email * string) (*domain.User, error){
+	doc, err := client.Collection("UserProfile").Doc(*email).Get(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +48,7 @@ func (repo UserFirestore) Get(email string) (*domain.User, error){
 	return &res, nil
 }
 
-func (repo UserFirestore) GetUserFromId(id string) (* domain.User, error){
+func (repo UserFirestore) GetUserFromId(id * string) (* domain.User, error){
 	iter := client.Collection("UserProfile").Where("id", "==", id).Documents(ctx)
 	for {
 		doc, err := iter.Next()
@@ -55,15 +68,35 @@ func (repo UserFirestore) GetUserFromId(id string) (* domain.User, error){
 	}
 	return nil, errors.New("Couldn't find the user")
 }
+func (repo UserFirestore) EmailExists(email * string) bool{
+	_, err := client.Collection("UserProfile").Doc(*email).Get(ctx)
+	return err == nil
+}
 func (repo UserFirestore) UpdateUser(user * domain.User) (* domain.User, error) {
-	_, err := client.Collection("UserProfile").Doc(user.Email).Set(ctx, user)
+	mapUser, err := turnStructToMap(user)
+	if err != nil{
+		return nil, err
+	}
+	_, err = client.Collection("UserProfile").Doc(* user.Email).Set(ctx, mapUser)
 	if err != nil{
 		return nil, err
 	}
 	return user, nil
 }
-
+//TODO check if we need to merge update and save
+func (repo UserFirestore) Save(user * domain.User) (* domain.User, error){
+	mapUser, err := turnStructToMap(user)
+	if err != nil{
+		return nil, err
+	}
+	_, err = client.Collection("UserProfile").Doc(* user.Email).Set(ctx, mapUser)
+	if err != nil{
+		return nil, err
+	}
+	return user, nil
+}
 func init(){
+	//TODO clean up inits
 	var err error
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 

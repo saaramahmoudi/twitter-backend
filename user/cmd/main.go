@@ -10,8 +10,10 @@ func main(){
 
 
 	r := mux.NewRouter()
-	r.HandleFunc("/update/{email}/{id}", user.UpdateUserIdFunction).Methods("PUT")
-	r.HandleFunc("/{email}", user.GetUserFunction).Methods("GET")
+	r.HandleFunc("/create", user.CreateUser)
+	r.HandleFunc("/update", user.UpdateUserIdFunction)
+	r.HandleFunc("/get", user.GetUserFunction)
+	r.HandleFunc("/check", user.CheckDoc)
 
 	http.ListenAndServe(":8080", r)
 
