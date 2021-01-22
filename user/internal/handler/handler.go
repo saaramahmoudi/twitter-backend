@@ -36,7 +36,7 @@ func (handler * HttpHandler) GetUser(w http.ResponseWriter, req * http.Request){
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		log.Println(err)
-		json.NewEncoder(w).Encode(errors.UserErrors{Message: "Could not find user email"})
+		json.NewEncoder(w).Encode(errors.UserErrors{Message: err.Error()})
 		return
 	}
 	json.NewEncoder(w).Encode(user)
@@ -51,13 +51,13 @@ func (handler * HttpHandler) UpdateUserId(w http.ResponseWriter, req * http.Requ
 	err := json.NewDecoder(req.Body).Decode(&in)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(errors.UserErrors{Message: "Id not on request"})
+		json.NewEncoder(w).Encode(errors.UserErrors{Message: err.Error()})
 		return
 	}
 	user, err := handler.UserService.UpdateId(handler.GetAuthContext(w, req), &in.Id)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(errors.UserErrors{Message: "Could not find user email"})
+		json.NewEncoder(w).Encode(errors.UserErrors{Message: err.Error()})
 		return
 	}
 	json.NewEncoder(w).Encode(user)

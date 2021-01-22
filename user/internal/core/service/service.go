@@ -22,11 +22,17 @@ func (u UserService) UpdateId(ctx context.Context, id * string) (* domain.User, 
 	if !u.Auth.IsLoggedIn(ctx) {
 		return nil, errors.New("User should be logged in for id update")
 	}
+
 	email, err := u.Auth.GetEmail(ctx)
 	if err != nil {
 		return nil, err
 	}
 	user, err := u.Get(ctx, email)
+
+	if err != nil{
+		return user, err
+	}
+	user, err = domain.NewUser(user.Name, user.Email, id, user.ImageSrc)
 	if err != nil{
 		return user, err
 	}
