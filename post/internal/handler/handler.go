@@ -14,7 +14,7 @@ import (
 // TODO do factory for this later
 type HttpHandler struct {
 	PostService service.PostService
-	AuthService user.HttpAuth
+	AuthService user.UserAuth
 }
 // TODO check if this can be factored out into only being into the users module
 func (handler * HttpHandler) GetAuthContext(w http.ResponseWriter, req * http.Request) context.Context{
@@ -43,8 +43,8 @@ func (handler * HttpHandler) GetPostById(w http.ResponseWriter, req * http.Reque
 }
 
 type CreatePostInput struct {
-	Text * string `json:"id"`
-	MediaType * tweet.MediaType `json:"id"`
+	Text * string `json:"text"`
+	MediaType * tweet.MediaType `json:"mediaType"`
 }
 
 func (handler * HttpHandler) CreatePost(w http.ResponseWriter, req * http.Request){

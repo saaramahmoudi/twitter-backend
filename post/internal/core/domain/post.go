@@ -2,7 +2,7 @@ package domain
 
 
 type Post struct {
-	Id * string `json:"userId";firestore:"userId,omitempty"`
+	Id * string `json:"id";firestore:"userId,omitempty"`
 	UserId * string `json:"userId";firestore:"userId,omitempty"`
 	TweetId * string `json:"tweetId";firestore:"tweetId,omitempty"`
 	LikedByUserIds []string `json:"likedByUserIds";firestore:"likedByUserIds,omitempty"`

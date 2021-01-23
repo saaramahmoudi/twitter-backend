@@ -25,12 +25,10 @@ func CORSCheck(handler func (w http.ResponseWriter, req *http.Request)) func (w 
 }
 
 var authHandler = user.ApiAuth
-var userService = service.PostService{Repo: repositories.PostFirestore{}}
-var httpHandler = handler.HttpHandler{UserService: userService, AuthService: authHandler}
-var GetUserFunction = CORSCheck(httpHandler.GetUser)
-var UpdateUserIdFunction = CORSCheck(httpHandler.UpdateUserId)
-var CreateUser = CORSCheck(httpHandler.CreateUser)
-var CheckDoc = CORSCheck(httpHandler.CheckDoc)
+var postService = service.PostService{Repo: repositories.PostFirestore{}}
+var httpHandler = handler.HttpHandler{PostService: postService, AuthService: authHandler}
+var GetPostByIdFunction = CORSCheck(httpHandler.GetPostById)
+var CreatePostFunction = CORSCheck(httpHandler.CreatePost)
 
 
 

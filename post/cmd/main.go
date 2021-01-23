@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/saaramahmoudi/twitter-backend/user"
+	"github.com/saaramahmoudi/twitter-backend/post"
 	"net/http"
 )
 
@@ -10,10 +10,8 @@ func main(){
 
 
 	r := mux.NewRouter()
-	r.HandleFunc("/create", user.CreateUser)
-	r.HandleFunc("/update", user.UpdateUserIdFunction)
-	r.HandleFunc("/get", user.GetUserFunction)
-	r.HandleFunc("/check", user.CheckDoc)
+	r.HandleFunc("/create", post.CreatePostFunction)
+	r.HandleFunc("/get", post.GetPostByIdFunction)
 
 	http.ListenAndServe(":8080", r)
 
