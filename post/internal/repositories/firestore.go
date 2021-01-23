@@ -4,6 +4,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/json"
+	"errors"
 	firebase "firebase.google.com/go"
 	"github.com/saaramahmoudi/twitter-backend/post/internal/core/domain"
 	"log"
@@ -16,6 +17,7 @@ type PostFirestore struct{
 var client *firestore.Client
 var ctx = context.Background()
 var app *firebase.App
+const CollectionAddress = "Posts"
 // This is used because it seems that the gcp firestore library does not use json tags correctly for creating documents
 func turnStructToMap(input interface{}) (map[string]interface{}, error) {
 	bytes, err := json.Marshal(&input)
@@ -30,33 +32,39 @@ func turnStructToMap(input interface{}) (map[string]interface{}, error) {
 	return res, nil
 }
 func (repo PostFirestore) Get(id * string) (*domain.Post, error){
-	doc, err := client.Collection("UserProfile").Doc(*email).Get(ctx)
+	doc, err := client.Collection(CollectionAddress).Doc(*id).Get(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	res := domain.User{}
+	res := domain.Post{}
 	errDataTransfer := doc.DataTo(&res)
 
 	if errDataTransfer != nil {
 		return nil, errDataTransfer
 	}
-	// This is because we don't keep the email on the firestore to avoid repetition TODO check if it's a good design
-	res.Email = email
 	return &res, nil
+}
+
+func (repo PostFirestore) GetNewId() (*string, error) {
+	ref := client.Collection(CollectionAddress).NewDoc()
+	if ref.ID == ""{
+		return nil, errors.New("Could not create a new post")
+	}
+	return &ref.ID, nil
 }
 
 //TODO check if we need to merge update and save
 func (repo PostFirestore) Save(post * domain.Post) (* domain.Post, error){
-	mapUser, err := turnStructToMap(user)
+	mapUser, err := turnStructToMap(post)
 	if err != nil{
 		return nil, err
 	}
-	_, err = client.Collection("UserProfile").Doc(* user.Email).Set(ctx, mapUser)
+	_, err = client.Collection(CollectionAddress).Doc(* post.Id).Set(ctx, mapUser)
 	if err != nil{
 		return nil, err
 	}
-	return user, nil
+	return post, nil
 }
 func init(){
 	//TODO clean up inits
