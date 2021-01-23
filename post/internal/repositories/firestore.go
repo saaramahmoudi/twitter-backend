@@ -4,14 +4,12 @@ import (
 	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/json"
-	"errors"
 	firebase "firebase.google.com/go"
-	"github.com/saaramahmoudi/twitter-backend/user/internal/core/domain"
-	"google.golang.org/api/iterator"
+	"github.com/saaramahmoudi/twitter-backend/post/internal/core/domain"
 	"log"
 )
 
-type UserFirestore struct{
+type PostFirestore struct{
 
 }
 
@@ -31,7 +29,7 @@ func turnStructToMap(input interface{}) (map[string]interface{}, error) {
 	}
 	return res, nil
 }
-func (repo UserFirestore) Get(email * string) (*domain.User, error){
+func (repo PostFirestore) Get(id * string) (*domain.Post, error){
 	doc, err := client.Collection("UserProfile").Doc(*email).Get(ctx)
 	if err != nil {
 		return nil, err
@@ -48,43 +46,8 @@ func (repo UserFirestore) Get(email * string) (*domain.User, error){
 	return &res, nil
 }
 
-func (repo UserFirestore) GetUserFromTag(tag * string) (* domain.User, error){
-	iter := client.Collection("UserProfile").Where("tag", "==", tag).Documents(ctx)
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		user := domain.User{}
-		err = doc.DataTo(&user)
-		if err != nil {
-			continue
-		}
-		//This is because the tags are also unique to users, TODO remove this dep
-		return &user, nil
-	}
-	return nil, errors.New("Couldn't find the user")
-}
-func (repo UserFirestore) EmailExists(email * string) bool{
-	_, err := client.Collection("UserProfile").Doc(*email).Get(ctx)
-	return err == nil
-}
-func (repo UserFirestore) UpdateUser(user * domain.User) (* domain.User, error) {
-	mapUser, err := turnStructToMap(user)
-	if err != nil{
-		return nil, err
-	}
-	_, err = client.Collection("UserProfile").Doc(* user.Email).Set(ctx, mapUser)
-	if err != nil{
-		return nil, err
-	}
-	return user, nil
-}
 //TODO check if we need to merge update and save
-func (repo UserFirestore) Save(user * domain.User) (* domain.User, error){
+func (repo PostFirestore) Save(post * domain.Post) (* domain.Post, error){
 	mapUser, err := turnStructToMap(user)
 	if err != nil{
 		return nil, err

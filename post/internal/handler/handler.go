@@ -42,19 +42,19 @@ func (handler * HttpHandler) GetUser(w http.ResponseWriter, req * http.Request){
 	json.NewEncoder(w).Encode(user)
 }
 
-type TagUpdateInput struct {
-	Tag string `json:"tag"`
+type IdUpdateInput struct {
+	Id string `json:"id"`
 }
 
-func (handler * HttpHandler) UpdateUserTag(w http.ResponseWriter, req * http.Request){
-	in := TagUpdateInput{}
+func (handler * HttpHandler) UpdateUserId(w http.ResponseWriter, req * http.Request){
+	in := IdUpdateInput{}
 	err := json.NewDecoder(req.Body).Decode(&in)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(errors.UserErrors{Message: err.Error()})
 		return
 	}
-	user, err := handler.UserService.UpdateTag(handler.GetAuthContext(w, req), &in.Tag)
+	user, err := handler.UserService.UpdateId(handler.GetAuthContext(w, req), &in.Id)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(errors.UserErrors{Message: err.Error()})

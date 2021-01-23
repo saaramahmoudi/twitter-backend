@@ -18,9 +18,9 @@ func (u UserService) Get(ctx context.Context, email *  string) (* domain.User, e
 }
 
 //This is the example of why we have a repo and a domain service at the same time
-func (u UserService) UpdateId(ctx context.Context, id * string) (* domain.User, error){
+func (u UserService) UpdateTag(ctx context.Context, tag * string) (* domain.User, error){
 	if !u.Auth.IsLoggedIn(ctx) {
-		return nil, errors.New("User should be logged in for id update")
+		return nil, errors.New("User should be logged in for tag update")
 	}
 
 	email, err := u.Auth.GetEmail(ctx)
@@ -32,17 +32,17 @@ func (u UserService) UpdateId(ctx context.Context, id * string) (* domain.User, 
 	if err != nil{
 		return user, err
 	}
-	user, err = domain.NewUser(user.Name, user.Email, id, user.ImageSrc)
+	user, err = domain.NewUser(user.Name, user.Email, tag, user.ImageSrc)
 	if err != nil{
 		return user, err
 	}
 
-	userWithId, err := u.Repo.GetUserFromId(id)
-	if userWithId != nil{
+	userWithTag, err := u.Repo.GetUserFromTag(tag)
+	if userWithTag != nil{
 		return nil, errors.New("User already exits")
 	}
 
-	user.Id = id
+	user.Tag = tag
 	user, err = u.Repo.UpdateUser(user)
 
 	return user, err
@@ -53,7 +53,7 @@ func (u UserService) UpdateId(ctx context.Context, id * string) (* domain.User, 
 func (u UserService) Create(ctx context.Context) (* domain.User, error) {
 
 	if !u.Auth.IsLoggedIn(ctx) {
-		return nil, errors.New("User should be logged in for id update")
+		return nil, errors.New("User should be logged in for tag update")
 	}
 
 	authEmail, err := u.Auth.GetEmail(ctx)

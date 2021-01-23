@@ -11,7 +11,7 @@ func main(){
 
 	r := mux.NewRouter()
 	r.HandleFunc("/create", user.CreateUser)
-	r.HandleFunc("/update", user.UpdateUserTagFunction)
+	r.HandleFunc("/update", user.UpdateUserIdFunction)
 	r.HandleFunc("/get", user.GetUserFunction)
 	r.HandleFunc("/check", user.CheckDoc)
 

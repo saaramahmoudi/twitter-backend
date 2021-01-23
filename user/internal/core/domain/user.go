@@ -8,30 +8,33 @@ import (
 
 // The most inner impl
 type User struct {
-	Name * string `json:"name";firestore:"name,omitempty"`
-	Email * string `json:"email";firestore:"email,omitempty"`
-	Id * string `json:"id";firestore:"id,omitempty"`
+	Id		 * string `json:"id";firestore:"id,omitempty"`
+	Name     * string `json:"name";firestore:"name,omitempty"`
+	Email    * string `json:"email";firestore:"email,omitempty"`
+	Tag      * string `json:"tag";firestore:"tag,omitempty"`
 	ImageSrc * string `json:"imageSrc";firestore:"imageSrc,omitempty"`
 }
 
 
-func isIdValid(id string) bool {
+func isIdValid(tag string) bool {
 	hasSpaceInMiddleReg := regexp.MustCompile(`[[a-zA-Z0-9@]+[\s]+[a-zA-Z0-9@]+]*`)
 	isNotEmptyReg := regexp.MustCompile(`[a-zA-Z0-9@]+`)
-	hasSpaceInMiddle := hasSpaceInMiddleReg.MatchString(id)
-	isNotEmpty := isNotEmptyReg.MatchString(id)
+	hasSpaceInMiddle := hasSpaceInMiddleReg.MatchString(tag)
+	isNotEmpty := isNotEmptyReg.MatchString(tag)
 
 	return !hasSpaceInMiddle && isNotEmpty
 }
 
-func NewUser(Name * string, Email * string, Id * string, ImageSrc * string) (* User, error) {
-	id := strings.TrimSpace(*Id)
-	valid := isIdValid(id)
+func NewUser(Name * string, Email * string, Tag * string, ImageSrc * string) (* User, error) {
+	tag := strings.TrimSpace(*Tag)
+	valid := isIdValid(tag)
 	if !valid {
-		return nil, errors.New("User id not valid")
+		return nil, errors.New("User tag not valid")
 	}
 
-	res := &User{Name: Name, Email: Email, Id: &id, ImageSrc: ImageSrc}
+	id := *Email
+
+	res := &User{Id: &id, Name: Name, Email: Email, Tag: &tag, ImageSrc: ImageSrc}
 
 	return res, nil
 

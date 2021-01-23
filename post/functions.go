@@ -27,7 +27,7 @@ var authHandler = authenticators.FirebaseAuthenticator{}
 var userService = service.UserService{Repo: repositories.UserFirestore{}, Auth: authHandler}
 var httpHandler = handler.HttpHandler{UserService: userService, AuthService: authHandler}
 var GetUserFunction = CORSCheck(httpHandler.GetUser)
-var UpdateUserTagFunction = CORSCheck(httpHandler.UpdateUserTag)
+var UpdateUserIdFunction = CORSCheck(httpHandler.UpdateUserId)
 var CreateUser = CORSCheck(httpHandler.CreateUser)
 var CheckDoc = CORSCheck(httpHandler.CheckDoc)
 
