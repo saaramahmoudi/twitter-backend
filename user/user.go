@@ -8,16 +8,7 @@ type UserApi struct {
 	ports.UserService
 }
 
-//var NewTweet = domain.NewTweet
-//type MediaType = domain.MediaType
-//type Tweet = domain.Tweet
-//var Api = UserApi{UserService: service.UserService{Repo: repositories.UserFirestore{}, Auth: authenticators.FirebaseAuthenticator{}}, Us: authenticators.FirebaseAuthenticator{}
-
-
-
-
-
-
+var Api = UserApi{UserService: userService}
 
 
 

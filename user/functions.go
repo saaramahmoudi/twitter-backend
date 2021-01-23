@@ -23,9 +23,9 @@ func CORSCheck(handler func (w http.ResponseWriter, req *http.Request)) func (w 
 	}
 	return res
 }
-
 var authHandler = authenticators.FirebaseAuthenticator{}
-var httpHandler = handler.HttpHandler{UserService: service.UserService{Repo: repositories.UserFirestore{}, Auth: authHandler}, AuthService: authHandler}
+var userService = service.UserService{Repo: repositories.UserFirestore{}, Auth: authHandler}
+var httpHandler = handler.HttpHandler{UserService: userService, AuthService: authHandler}
 var GetUserFunction = CORSCheck(httpHandler.GetUser)
 var UpdateUserIdFunction = CORSCheck(httpHandler.UpdateUserId)
 var CreateUser = CORSCheck(httpHandler.CreateUser)
