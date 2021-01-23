@@ -1,4 +1,4 @@
-package user
+package post
 
 import (
 	"github.com/saaramahmoudi/twitter-backend/user/internal/core/domain"

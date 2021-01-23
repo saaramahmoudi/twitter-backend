@@ -13,7 +13,6 @@ type UserAuth struct {
 }
 
 type User = domain.User
-type HttpAuth = ports.HttpUserAuthenticator
 var ApiAuth = UserAuth{HttpUserAuthenticator: authHandler}
 var Api = UserApi{UserService: userService}
 
