@@ -13,8 +13,8 @@ type UserService struct {
 	Repo ports.UserRepository
 	Auth ports.UserAuthenticator
 }
-func (u UserService) Get(ctx context.Context, email *  string) (* domain.User, error){
-	return u.Repo.Get(email)
+func (u UserService) GetByEmail(ctx context.Context, email *  string) (* domain.User, error){
+	return u.Repo.GetByEmail(email)
 }
 
 //This is the example of why we have a repo and a domain service at the same time
@@ -27,7 +27,7 @@ func (u UserService) UpdateTag(ctx context.Context, tag * string) (* domain.User
 	if err != nil {
 		return nil, err
 	}
-	user, err := u.Get(ctx, email)
+	user, err := u.GetByEmail(ctx, email)
 
 	if err != nil{
 		return user, err
@@ -60,8 +60,11 @@ func (u UserService) Create(ctx context.Context) (* domain.User, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if u.Repo.EmailExists(authEmail) {
+	exists, err := u.Repo.EmailExists(authEmail)
+	if err != nil{
+		return nil, err
+	}
+	if  *exists {
 		return nil, errors.New("User already has an account")
 	}
 	name := ""
@@ -81,8 +84,8 @@ func (u UserService) EmailExists(ctx context.Context) (* bool, error) {
 	if err != nil {
 		return nil, err
 	}
-	res := u.Repo.EmailExists(email)
-	return &res, nil
+	res, err := u.Repo.EmailExists(email)
+	return res, err
 }
 
 

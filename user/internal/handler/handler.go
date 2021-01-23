@@ -32,7 +32,7 @@ func (handler * HttpHandler) GetUser(w http.ResponseWriter, req * http.Request){
 		log.Fatal(err)
 	}
 	email := reqT.Email
-	user, err := handler.UserService.Get(handler.GetAuthContext(w, req), &email)
+	user, err := handler.UserService.GetByEmail(handler.GetAuthContext(w, req), &email)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		log.Println(err)

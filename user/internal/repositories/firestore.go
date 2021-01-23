@@ -18,6 +18,7 @@ type UserFirestore struct{
 var client *firestore.Client
 var ctx = context.Background()
 var app *firebase.App
+const CollectionAddress = "UserProfile"
 // This is used because it seems that the gcp firestore library does not use json tags correctly for creating documents
 func turnStructToMap(input interface{}) (map[string]interface{}, error) {
 	bytes, err := json.Marshal(&input)
@@ -31,8 +32,44 @@ func turnStructToMap(input interface{}) (map[string]interface{}, error) {
 	}
 	return res, nil
 }
-func (repo UserFirestore) Get(email * string) (*domain.User, error){
-	doc, err := client.Collection("UserProfile").Doc(*email).Get(ctx)
+
+const EmailNotExists = "user not found"
+// TODO EmailNotExists creates an unseen dep between emailExists and get by email, remove in future iteration
+func (repo UserFirestore) EmailExists(email * string) (*bool, error){
+	_, err := repo.GetByEmail(email)
+	found := true
+	if err != nil && err.Error() == EmailNotExists {
+		found = false
+		err = nil
+	} else if err != nil {
+		found = false
+	}
+
+	return &found, err
+
+}
+func (repo UserFirestore) GetByEmail(email * string) (*domain.User, error){
+	iter := client.Collection(CollectionAddress).Where("email", "==", email).Documents(ctx)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		user := domain.User{}
+		err = doc.DataTo(&user)
+		if err != nil {
+			continue
+		}
+		return &user, nil
+	}
+	return nil, errors.New(EmailNotExists)
+
+}
+func (repo UserFirestore) GetById(id * string) (*domain.User, error){
+	doc, err := client.Collection(CollectionAddress).Doc(*id).Get(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -44,12 +81,12 @@ func (repo UserFirestore) Get(email * string) (*domain.User, error){
 		return nil, errDataTransfer
 	}
 	// This is because we don't keep the email on the firestore to avoid repetition TODO check if it's a good design
-	res.Email = email
+	res.Email = id
 	return &res, nil
 }
 
 func (repo UserFirestore) GetUserFromTag(tag * string) (* domain.User, error){
-	iter := client.Collection("UserProfile").Where("tag", "==", tag).Documents(ctx)
+	iter := client.Collection(CollectionAddress).Where("tag", "==", tag).Documents(ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -68,16 +105,12 @@ func (repo UserFirestore) GetUserFromTag(tag * string) (* domain.User, error){
 	}
 	return nil, errors.New("Couldn't find the user")
 }
-func (repo UserFirestore) EmailExists(email * string) bool{
-	_, err := client.Collection("UserProfile").Doc(*email).Get(ctx)
-	return err == nil
-}
 func (repo UserFirestore) UpdateUser(user * domain.User) (* domain.User, error) {
 	mapUser, err := turnStructToMap(user)
 	if err != nil{
 		return nil, err
 	}
-	_, err = client.Collection("UserProfile").Doc(* user.Email).Set(ctx, mapUser)
+	_, err = client.Collection(CollectionAddress).Doc(* user.Id).Set(ctx, mapUser)
 	if err != nil{
 		return nil, err
 	}
@@ -89,7 +122,7 @@ func (repo UserFirestore) Save(user * domain.User) (* domain.User, error){
 	if err != nil{
 		return nil, err
 	}
-	_, err = client.Collection("UserProfile").Doc(* user.Email).Set(ctx, mapUser)
+	_, err = client.Collection(CollectionAddress).Doc(* user.Id).Set(ctx, mapUser)
 	if err != nil{
 		return nil, err
 	}
