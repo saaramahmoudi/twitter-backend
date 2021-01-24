@@ -61,7 +61,7 @@ func FireStoreTransfer(ctx context.Context, e FirestoreEvent) error {
 		return err
 	}
 	ret := ResClass{ObjectID: *userInstance.Id, User: *userInstance}
-	res, err := index.SaveObject(ret)
+	_, err = index.SaveObject(ret)
 	if err != nil {
 		log.Println(err)
 		return err
