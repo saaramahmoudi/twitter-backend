@@ -3,6 +3,7 @@ package post
 import (
 	"github.com/saaramahmoudi/twitter-backend/post/internal/core/service"
 	"github.com/saaramahmoudi/twitter-backend/post/internal/handler"
+	"github.com/saaramahmoudi/twitter-backend/post/internal/publisher"
 	"github.com/saaramahmoudi/twitter-backend/post/internal/repositories"
 	"github.com/saaramahmoudi/twitter-backend/user"
 	"net/http"
@@ -25,7 +26,7 @@ func CORSCheck(handler func (w http.ResponseWriter, req *http.Request)) func (w 
 }
 
 var authHandler = user.ApiAuth
-var postService = service.PostService{Repo: repositories.PostFirestore{}}
+var postService = service.PostService{Repo: repositories.PostFirestore{}, Auth: authHandler, Publisher: &publisher.EventPublisher{}}
 var httpHandler = handler.HttpHandler{PostService: postService, AuthService: authHandler}
 var GetPostByIdFunction = CORSCheck(httpHandler.GetPostById)
 var CreatePostFunction = CORSCheck(httpHandler.CreatePost)

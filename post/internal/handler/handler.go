@@ -48,8 +48,6 @@ type CreatePostInput struct {
 }
 
 func (handler * HttpHandler) CreatePost(w http.ResponseWriter, req * http.Request){
-
-
 	reqT := CreatePostInput{}
 	err := json.NewDecoder(req.Body).Decode(&reqT)
 	if err != nil {
