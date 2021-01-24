@@ -32,7 +32,7 @@ type PostTopicMessage struct {
 
 func (ep * EventPublisher) Publish(event * domain.PostEvent) (* string, error) {
 
-	t := client.Topic(event.EventType)
+	t := client.Topic("PostFeed")
 
 	message := PostTopicMessage{
 		PostId: event.Post.Id,
