@@ -1,8 +1,12 @@
 package feed
 
-import "github.com/saaramahmoudi/twitter-backend/feed/internal/handler"
+import (
+	"github.com/saaramahmoudi/twitter-backend/user"
+	"github.com/saaramahmoudi/twitter-backend/feed/internal/handler"
+)
 
-var HelloPubSub = handler.HelloPubSub
+var messageHandler = handler.MessageHandler{user.Api}
+var Handle = messageHandler.Handle
 
 
 

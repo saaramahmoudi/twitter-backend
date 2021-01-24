@@ -43,6 +43,22 @@ func NewUser(Name * string, Email * string, Tag * string, ImageSrc * string) (* 
 }
 
 
+func (u *User) followUser(otherUser *User){
+	u.FollowingsId = append(u.FollowingsId, *otherUser.Id)
+}
+
+func (u *User) unFollowUser(otherUser *User){
+	u.FollowingsId = append(u.FollowingsId, *otherUser.Id)
+}
+
+func (u *User) getFollower(otherUser *User){
+	u.FollowersId = append(u.FollowersId, *otherUser.Id)
+}
+
+func (u *User) removeFollower(otherUser *User){
+	u.FollowersId = append(u.FollowersId, *otherUser.Id)
+}
+
 
 
 

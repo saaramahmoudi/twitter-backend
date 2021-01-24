@@ -19,7 +19,7 @@ type PubSubMessage struct {
 }
 
 // HelloPubSub consumes a Pub/Sub message.
-func HelloPubSub(ctx context.Context, m PubSubMessage) error {
+func (mh MessageHandler) Handle(ctx context.Context, m PubSubMessage) error {
 	message := post.PostTopicMessage{}
 	err := json.Unmarshal(m.Data, &message)
 	if err != nil{
@@ -27,7 +27,13 @@ func HelloPubSub(ctx context.Context, m PubSubMessage) error {
 		return err
 	}
 
-	log.Println(message)
+	if message.EventType ==  post.PostPublished {
+		log.Println("Post published")
+	} else if message.EventType == post.PostRetweeted {
+		log.Println("Post retweeted")
+	} else if message.EventType == post.PostLiked {
+		log.Println("Post liked")
+	}
 
 	return nil
 }
