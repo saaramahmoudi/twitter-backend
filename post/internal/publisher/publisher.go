@@ -3,6 +3,7 @@ package publisher
 import (
 	"cloud.google.com/go/pubsub"
 	"context"
+	"encoding/json"
 	"github.com/saaramahmoudi/twitter-backend/post/internal/core/domain"
 	"log"
 )
@@ -22,15 +23,29 @@ func init (){
 		log.Fatal(err)
 	}
 }
+
+type PostTopicMessage struct {
+	PostId * string `json:"postId"`
+	EventType domain.EventEnum `json:"eventType"`
+	MadeByUserId * string `json:"madeByUserId"`
+}
+
 func (ep * EventPublisher) Publish(event * domain.PostEvent) (* string, error) {
 
 	t := client.Topic(event.EventType)
 
+	message := PostTopicMessage{
+		PostId: event.Post.Id,
+		EventType: event.EventType,
+		MadeByUserId: event.MadeByUserId,
+	}
+
+	bytes, err := json.Marshal(message)
+	if err != nil {
+		return nil, err
+	}
 	result := t.Publish(ctx, &pubsub.Message{
-		Data: []byte(event.EventType),
-		Attributes: map[string]string{
-			"id":   *event.Post.Id,
-		},
+		Data: bytes,
 	})
 
 

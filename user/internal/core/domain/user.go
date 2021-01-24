@@ -13,6 +13,8 @@ type User struct {
 	Email    * string `json:"email";firestore:"email,omitempty"`
 	Tag      * string `json:"tag";firestore:"tag,omitempty"`
 	ImageSrc * string `json:"imageSrc";firestore:"imageSrc,omitempty"`
+	FollowersId []string `json:"followersId";firestore:"followersId,omitempty"`
+	FollowingsId []string `json:"followingsId";firestore:"followingsId,omitempty"`
 }
 
 
@@ -28,16 +30,16 @@ func isIdValid(tag string) bool {
 func NewUser(Name * string, Email * string, Tag * string, ImageSrc * string) (* User, error) {
 	tag := strings.TrimSpace(*Tag)
 	valid := isIdValid(tag)
+
 	if !valid {
 		return nil, errors.New("User tag not valid")
 	}
 
 	id := *Email
 
-	res := &User{Id: &id, Name: Name, Email: Email, Tag: &tag, ImageSrc: ImageSrc}
+	res := &User{Id: &id, Name: Name, Email: Email, Tag: &tag, ImageSrc: ImageSrc, FollowersId: []string{}, FollowingsId: []string{}}
 
 	return res, nil
-
 }
 
 
