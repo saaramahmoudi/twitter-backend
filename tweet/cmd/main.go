@@ -8,7 +8,7 @@ import (
 func main(){
 
 	// Test creating
-	text := "Something #new"
+	text := "#wasd1 something #wasd asd #wasd2"
 	tweetInstance, err := tweet.Api.Create(&text, nil)
 
 	if err != nil {

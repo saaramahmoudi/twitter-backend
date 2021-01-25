@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"log"
 	"regexp"
 )
 
@@ -25,9 +26,8 @@ func NewTweet(NewID *  string, Text * string, Media * MediaType) (* Tweet, error
 		return nil, errors.New("Text length not valid")
 	}
 
-	r := regexp.MustCompile(`\B#\w\w+`)
+	r := regexp.MustCompile(`#[a-zA-Z0-9@]+`)
 	Hashtags := r.FindAllString(*Text, -1)
-
 
 	return &Tweet{NewID,Text, Media, &Hashtags}, nil
 }
