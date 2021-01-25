@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 	"github.com/saaramahmoudi/twitter-backend/tweet/internal/core/domain"
-	"github.com/saaramahmoudi/twitter-backend/tweet/utils"
+	"github.com/saaramahmoudi/twitter-backend/utils"
 
 	//"errors"
 	firebase "firebase.google.com/go"
@@ -42,7 +42,11 @@ func (tf TweetFirestore) GetTweet(id * string) (*domain.Tweet, error) {
 	return res, nil
 }
 func (tf TweetFirestore) UpdateTweet(tweet *domain.Tweet) (*domain.Tweet, error) {
-	_, err := client.Collection(CollectionAddress).Doc(*tweet.ID).Set(ctx, tweet)
+	map1, err := utils.TurnStructToMap(tweet)
+	if err != nil{
+		return nil, err
+	}
+	_, err = client.Collection(CollectionAddress).Doc(*tweet.ID).Set(ctx, map1)
 	if err != nil{
 		log.Println(err)
 		return nil, err
