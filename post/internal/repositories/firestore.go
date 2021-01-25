@@ -44,6 +44,7 @@ func (repo PostFirestore) GetNewId() (*string, error) {
 //TODO check if we need to merge update and save
 func (repo PostFirestore) Save(post * domain.Post) (* domain.Post, error){
 	mapUser, err := utils.TurnStructToMap(post)
+	log.Println(mapUser)
 	if err != nil{
 		return nil, err
 	}

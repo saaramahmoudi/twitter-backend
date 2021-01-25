@@ -12,10 +12,10 @@ type MediaType struct {
 
 // The most inner impl
 type Tweet struct {
-	ID * string `json:"id";firestore:"id,omitempty"`
-	Text * string `json:"text";firestore:"text,omitempty"`
-	Media * MediaType `json:"media";firestore:"media,omitempty"`
-	Hashtags * []string `json:"hashtags";firestore:"hashtags,omitempty"`
+	Id       * string    `json:"id";firestore:"id,omitempty"`
+	Text     * string    `json:"text";firestore:"text,omitempty"`
+	Media    * MediaType `json:"media";firestore:"media,omitempty"`
+	Hashtags * []string  `json:"hashtags";firestore:"hashtags,omitempty"`
 }
 
 

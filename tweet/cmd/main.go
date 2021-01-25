@@ -19,13 +19,13 @@ func main(){
 	still := true
 	tweetInstance.Media = &tweet.MediaType{MediaSrc: &add,  IsStill: &still}
 
-	tweetInstance, err = tweet.Api.Update(tweetInstance.ID, tweetInstance)
+	tweetInstance, err = tweet.Api.Update(tweetInstance.Id, tweetInstance)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = tweet.Api.Delete(tweetInstance)
+	//err = tweet.Api.Delete(tweetInstance)
 
 	if err != nil {
 		log.Fatal(err)

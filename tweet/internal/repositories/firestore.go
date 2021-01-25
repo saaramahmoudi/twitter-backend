@@ -46,7 +46,7 @@ func (tf TweetFirestore) UpdateTweet(tweet *domain.Tweet) (*domain.Tweet, error)
 	if err != nil{
 		return nil, err
 	}
-	_, err = client.Collection(CollectionAddress).Doc(*tweet.ID).Set(ctx, map1)
+	_, err = client.Collection(CollectionAddress).Doc(*tweet.Id).Set(ctx, map1)
 	if err != nil{
 		log.Println(err)
 		return nil, err
@@ -56,8 +56,8 @@ func (tf TweetFirestore) UpdateTweet(tweet *domain.Tweet) (*domain.Tweet, error)
 
 
 func (tf TweetFirestore) Save(tweet *domain.Tweet) (*domain.Tweet, error){
-	if tweet.ID == nil {
-		return nil, errors.New("Tweet ID was not set")
+	if tweet.Id == nil {
+		return nil, errors.New("Tweet Id was not set")
 	}
 	return tf.UpdateTweet(tweet)
 }
@@ -71,7 +71,7 @@ func (tf TweetFirestore) GetNewId() (* string, error){
 
 
 func (tf TweetFirestore) Delete(tweet *domain.Tweet) error{
-	_, err := client.Collection(CollectionAddress).Doc(*tweet.ID).Delete(ctx)
+	_, err := client.Collection(CollectionAddress).Doc(*tweet.Id).Delete(ctx)
 	return err
 }
 

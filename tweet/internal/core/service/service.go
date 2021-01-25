@@ -21,7 +21,7 @@ func (t TweetService) Update(id * string, tweet *domain.Tweet) (*domain.Tweet, e
 		return nil, err
 	}
 
-	tweet.ID = oldTweet.ID
+	tweet.Id = oldTweet.Id
 	if tweet.Text == nil {
 		tweet.Text = oldTweet.Text
 	}
@@ -29,7 +29,7 @@ func (t TweetService) Update(id * string, tweet *domain.Tweet) (*domain.Tweet, e
 		tweet.Media = oldTweet.Media
 	}
 
-	tweet, err = domain.NewTweet(tweet.ID, tweet.Text, tweet.Media)
+	tweet, err = domain.NewTweet(tweet.Id, tweet.Text, tweet.Media)
 
 	if err != nil {
 		return nil, err
