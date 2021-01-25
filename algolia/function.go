@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-type ResClass struct {
+type DataStoreUser struct {
 	ObjectID string `json:"objectID"`
 	user.User
 }
@@ -36,35 +36,88 @@ type FirestoreValue struct {
 	UpdateTime time.Time   `json:"updateTime"`
 }
 
-// HelloFirestore is triggered by a change to a Firestore document.
-func FireStoreTransfer(ctx context.Context, e FirestoreEvent) error {
-
-	client := search.NewClient(os.Getenv("API_ID"), os.Getenv("API_KEY"))
-	index := client.InitIndex("user")
+func getObject(fields interface{}, transferToData interface {}) (error) {
 
 	finalMap := make(map[string]interface{})
-	for key, element := range e.Value.Fields.(map[string]interface{}) {
-		for _, element2 := range element.(map[string]interface{}){
-			finalMap[key] = element2
+
+	log.Println("Got this data : ", fields)
+	//TODO find a better way to transform this object
+	for key, element := range fields.(map[string]interface{}) {
+		for key2, element2 := range element.(map[string]interface{}){
+			if key2 == "arrayValue" {
+			}else {
+				finalMap[key] = element2
+			}
 		}
 	}
+
+	log.Println("Got this map : ", finalMap)
+
 	bytes, err := json.Marshal(finalMap)
 	if err != nil {
-		log.Println(err)
+		return err
+	}
+	err = json.Unmarshal(bytes, transferToData)
+	if err != nil {
 		return err
 	}
 
-	userInstance := &user.User{}
-	err = json.Unmarshal(bytes, userInstance)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	ret := ResClass{ObjectID: *userInstance.Id, User: *userInstance}
-	_, err = index.SaveObject(ret)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 	return nil
+}
+var client * search.Client
+func init(){
+	client = search.NewClient(os.Getenv("API_ID"), os.Getenv("API_KEY"))
+}
+
+type FinalData struct {
+	ObjectID string `json:"objectID"`
+	Fields     interface{} `json:"fields"`
+}
+
+func getIdFromField(fields interface{}) string {
+	map1 := fields.(map[string]interface{})["id"]
+	res := map1.(map[string]interface{})["stringValue"]
+	return res.(string)
+}
+
+func FireStoreTransfer(ctx context.Context, e FirestoreEvent, index * search.Index) error {
+
+	var err error
+
+	if e.Value.Fields == nil {
+		log.Println("got this value : ", e.OldValue.Fields, e.OldValue.Name)
+		log.Println("Id : ", getIdFromField(e.OldValue.Fields))
+
+		d, err := index.DeleteObject(getIdFromField(e.OldValue.Fields))
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+		log.Println(d)
+		return nil
+	}
+
+	log.Println("got this value : ", e.Value.Fields, e.Value.Name)
+	log.Println("Id : ", getIdFromField(e.Value.Fields))
+
+	ret := FinalData{ObjectID: getIdFromField(e.Value.Fields), Fields: e.Value.Fields}
+	log.Println(ret)
+	res, err := index.SaveObject(ret)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	log.Println(res)
+	return nil
+}
+func FireStoreTransferUser(ctx context.Context, e FirestoreEvent) error {
+	index := client.InitIndex("user")
+
+	return FireStoreTransfer(ctx, e, index)
+}
+
+func FireStoreTransferTweet(ctx context.Context, e FirestoreEvent) error {
+	index := client.InitIndex("tweet")
+
+	return FireStoreTransfer(ctx, e, index)
 }

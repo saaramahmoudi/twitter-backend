@@ -49,7 +49,7 @@ func (repo UserFirestore) EmailExists(email * string) (*bool, error){
 
 }
 func (repo UserFirestore) GetByEmail(email * string) (*domain.User, error){
-	iter := client.Collection(CollectionAddress).Where("email", "==", email).Documents(ctx)
+	iter := client.Collection(CollectionAddress).Where("email", "==", *email).Documents(ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {

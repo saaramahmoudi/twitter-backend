@@ -15,13 +15,13 @@ type HttpHandler struct {
 	AuthService ports.HttpUserAuthenticator
 }
 
-type GetUserRequest struct {
-	Email string  `json:"email"`
-}
-
 func (handler * HttpHandler) GetAuthContext(w http.ResponseWriter, req * http.Request) context.Context{
 	header := req.Header.Get("Authorization")
 	return context.WithValue(context.Background(), handler.AuthService.GetAuthHeaderKey(), header)
+}
+
+type GetUserRequest struct {
+	Email string  `json:"email"`
 }
 
 func (handler * HttpHandler) GetUser(w http.ResponseWriter, req * http.Request){
