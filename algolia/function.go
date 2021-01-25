@@ -83,7 +83,7 @@ func getIdFromField(fields interface{}) string {
 func FireStoreTransfer(ctx context.Context, e FirestoreEvent, index * search.Index) error {
 
 	var err error
-
+	//TODO there is an unseen dep here that only docs with the field id can work with this method, try to address later
 	if e.Value.Fields == nil {
 		log.Println("got this value : ", e.OldValue.Fields, e.OldValue.Name)
 		log.Println("Id : ", getIdFromField(e.OldValue.Fields))
