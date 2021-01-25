@@ -1,7 +1,7 @@
 package utils
 
 import "encoding/json"
-
+// Used to get files on firebase to json form
 func TurnStructToMap(input interface{}) (map[string]interface{}, error) {
 	bytes, err := json.Marshal(&input)
 	if err != nil {
