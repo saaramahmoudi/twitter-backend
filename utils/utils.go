@@ -2,7 +2,7 @@ package utils
 
 import "encoding/json"
 
-func turnStructToMap(input interface{}) (map[string]interface{}, error) {
+func TurnStructToMap(input interface{}) (map[string]interface{}, error) {
 	bytes, err := json.Marshal(&input)
 	if err != nil {
 		return nil, err
