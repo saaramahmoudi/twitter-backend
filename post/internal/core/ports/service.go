@@ -11,6 +11,8 @@ import (
 type PostService interface {
 	Get(ctx context.Context, id * string) (* domain.Post, error)
 	Create(ctx context.Context, Text * string, MediaType * tweet.MediaType) (* domain.PostEvent, error)
+	ToggleLike(ctx context.Context, postId * string) (* domain.PostEvent, error)
+	ToggleRetweet(ctx context.Context, postId * string) (* domain.PostEvent, error)
 }
 
 

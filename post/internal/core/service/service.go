@@ -6,6 +6,7 @@ import (
 	"github.com/saaramahmoudi/twitter-backend/post/internal/core/ports"
 	"github.com/saaramahmoudi/twitter-backend/tweet"
 	"github.com/saaramahmoudi/twitter-backend/user"
+	"time"
 )
 
 // The second most inner impl
@@ -45,7 +46,8 @@ func (u PostService) Create(ctx context.Context, Text * string, MediaType *  twe
 	}
 
 
-	postEvent, err := domain.NewPost(id, userInstance.Id, tweetInstance.Id, []string{}, []string{})
+	currTime := time.Now()
+	postEvent, err := domain.NewPost(id, userInstance.Id, tweetInstance.Id, []string{}, []string{}, &currTime)
 	if err != nil{
 		return nil, err
 	}
@@ -63,7 +65,7 @@ func (u PostService) Create(ctx context.Context, Text * string, MediaType *  twe
 	return postEvent, err
 }
 
-func (u PostService) LikePost(ctx context.Context, postId * string) (* domain.PostEvent, error) {
+func (u PostService) ToggleLike(ctx context.Context, postId * string) (* domain.PostEvent, error) {
 	email, err := u.Auth.GetEmail(ctx)
 	if err != nil{
 		return nil, err
@@ -77,7 +79,9 @@ func (u PostService) LikePost(ctx context.Context, postId * string) (* domain.Po
 	if err != nil{
 		return nil, err
 	}
-	pe, err := post.LikePost(userInstance.Id)
+
+	currTime := time.Now()
+	pe, err := post.ToggleLikePost(userInstance.Id, &currTime)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +93,7 @@ func (u PostService) LikePost(ctx context.Context, postId * string) (* domain.Po
 }
 
 
-func (u PostService) RetweetPost(ctx context.Context, postId * string) (* domain.PostEvent, error) {
+func (u PostService) ToggleRetweet(ctx context.Context, postId * string) (* domain.PostEvent, error) {
 	email, err := u.Auth.GetEmail(ctx)
 	if err != nil{
 		return nil, err
@@ -104,8 +108,8 @@ func (u PostService) RetweetPost(ctx context.Context, postId * string) (* domain
 		return nil, err
 	}
 
-
-	pe, err := post.RetweetPost(userInstance.Id)
+	currTime := time.Now()
+	pe, err := post.ToggleRetweetPost(userInstance.Id, &currTime)
 	if err != nil {
 		return nil, err
 	}
