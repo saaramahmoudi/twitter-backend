@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/saaramahmoudi/twitter-backend/user/internal/core/domain"
 	"github.com/saaramahmoudi/twitter-backend/user/internal/core/ports"
+	"log"
 )
 
 // The second most inner impl
@@ -36,6 +37,7 @@ func (u UserService) UpdateTag(ctx context.Context, tag * string) (* domain.User
 	if err != nil{
 		return user, err
 	}
+
 
 	userWithTag, err := u.Repo.GetUserFromTag(tag)
 	if userWithTag != nil{
@@ -86,6 +88,26 @@ func (u UserService) EmailExists(ctx context.Context) (* bool, error) {
 	}
 	res, err := u.Repo.EmailExists(email)
 	return res, err
+}
+func (u UserService) ToggleFollowUser(ctx context.Context, secondUserId * string) error {
+	email, err := u.Auth.GetEmail(ctx)
+	if err != nil {
+		return err
+	}
+	user, err := u.GetByEmail(ctx, email)
+	if err != nil {
+		return err
+	}
+
+	operation := func (user1 * domain.User, user2 * domain.User) (* domain.User, * domain.User,  error) {
+		user1.TogglefollowingUser(user2)
+		log.Println(user2.FollowersId)
+		user2.ToggleFollower(user1)
+		log.Println(user2.FollowersId)
+		return user1, user2, nil
+	}
+	_, _, err  = u.Repo.GetSaveTransactionTwoUsers(user.Id, secondUserId, operation)
+	return err
 }
 
 

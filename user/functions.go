@@ -30,7 +30,7 @@ var GetUserFunction = CORSCheck(httpHandler.GetUser)
 var UpdateUserTagFunction = CORSCheck(httpHandler.UpdateUserTag)
 var CreateUser = CORSCheck(httpHandler.CreateUser)
 var CheckDoc = CORSCheck(httpHandler.CheckDoc)
-
+var ToggleFollow = CORSCheck(httpHandler.ToggleFollow)
 
 
 

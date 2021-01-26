@@ -12,6 +12,7 @@ type UserService interface {
 	UpdateTag(ctx context.Context, tag * string) (* domain.User, error)
 	Create(ctx context.Context) (* domain.User, error)
 	EmailExists(ctx context.Context) (* bool, error)
+	ToggleFollowUser(ctx context.Context, secondUserId * string) error
 }
 
 

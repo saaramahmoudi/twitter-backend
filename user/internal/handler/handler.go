@@ -91,6 +91,27 @@ func (handler * HttpHandler) CheckDoc(w http.ResponseWriter, req * http.Request)
 	res := DocCheckOutput{Exists: *exists}
 	json.NewEncoder(w).Encode(&res)
 }
+type FollowToggleInput struct{
+	UserId string `json:"userId"`
+}
+func (handler * HttpHandler) ToggleFollow(w http.ResponseWriter, req * http.Request){
+	in := FollowToggleInput{}
+	err := json.NewDecoder(req.Body).Decode(&in)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errors.UserErrors{Message: err.Error()})
+		return
+	}
+	err = handler.UserService.ToggleFollowUser(handler.GetAuthContext(w, req), &in.UserId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println(err)
+		json.NewEncoder(w).Encode(errors.UserErrors{Message: err.Error()})
+		return
+	}
+	res := struct{Success bool `json:"success"`}{Success: true}
+	json.NewEncoder(w).Encode(&res)
+}
 
 
 

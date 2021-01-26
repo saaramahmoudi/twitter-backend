@@ -3,10 +3,10 @@ package repositories
 import (
 	"cloud.google.com/go/firestore"
 	"context"
-	"encoding/json"
 	"errors"
 	firebase "firebase.google.com/go"
 	"github.com/saaramahmoudi/twitter-backend/user/internal/core/domain"
+	"github.com/saaramahmoudi/twitter-backend/utils"
 	"google.golang.org/api/iterator"
 	"log"
 )
@@ -20,18 +20,6 @@ var ctx = context.Background()
 var app *firebase.App
 const CollectionAddress = "UserProfile"
 // This is used because it seems that the gcp firestore library does not use json tags correctly for creating documents
-func turnStructToMap(input interface{}) (map[string]interface{}, error) {
-	bytes, err := json.Marshal(&input)
-	if err != nil {
-		return nil, err
-	}
-	var res map[string]interface{}
-	err = json.Unmarshal(bytes, &res)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
 
 const EmailNotExists = "user not found"
 // TODO EmailNotExists creates an unseen dep between emailExists and get by email, remove in future iteration
@@ -106,7 +94,7 @@ func (repo UserFirestore) GetUserFromTag(tag * string) (* domain.User, error){
 	return nil, errors.New("Couldn't find the user")
 }
 func (repo UserFirestore) UpdateUser(user * domain.User) (* domain.User, error) {
-	mapUser, err := turnStructToMap(user)
+	mapUser, err := utils.TurnStructToMap(user)
 	if err != nil{
 		return nil, err
 	}
@@ -116,9 +104,52 @@ func (repo UserFirestore) UpdateUser(user * domain.User) (* domain.User, error) 
 	}
 	return user, nil
 }
+func checkTransactionAndGetData(user * domain.User, ref *firestore.DocumentRef, tx *firestore.Transaction) error{
+
+	doc, err := tx.Get(ref) // tx.Get, NOT ref.Get!
+	if err != nil {
+		return err
+	}
+	err = doc.DataTo(user)
+	return err
+}
+func saveTransaction(user * domain.User, ref *firestore.DocumentRef, tx *firestore.Transaction) error {
+	mapSave, err := utils.TurnStructToMap(user)
+	if err != nil {
+		return err
+	}
+	return tx.Set(ref, mapSave)
+}
+func (repo UserFirestore) GetSaveTransactionTwoUsers(id1 * string, id2 * string, operation func (user1 * domain.User, user2 * domain.User) (* domain.User, * domain.User,  error)) (* domain.User, * domain.User, error){
+	ref1 := client.Collection(CollectionAddress).Doc(*id1)
+	ref2 := client.Collection(CollectionAddress).Doc(*id2)
+	user1 := &domain.User{}
+	user2 := &domain.User{}
+	err := client.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
+		err := checkTransactionAndGetData(user1, ref1, tx)
+		if err != nil{
+			return nil
+		}
+		err = checkTransactionAndGetData(user2, ref2, tx)
+		if err != nil{
+			return nil
+		}
+		user1, user2, err = operation(user1, user2)
+		if err != nil {
+			return err
+		}
+		err = saveTransaction(user1, ref1, tx)
+		if err != nil {
+			return err
+		}
+
+		return saveTransaction(user2, ref2, tx)
+	})
+	return user1, user2, err
+}
 //TODO check if we need to merge update and save
 func (repo UserFirestore) Save(user * domain.User) (* domain.User, error){
-	mapUser, err := turnStructToMap(user)
+	mapUser, err := utils.TurnStructToMap(user)
 	if err != nil{
 		return nil, err
 	}

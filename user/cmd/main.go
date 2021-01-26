@@ -14,9 +14,10 @@ func main(){
 	r.HandleFunc("/update", user.UpdateUserTagFunction)
 	r.HandleFunc("/get", user.GetUserFunction)
 	r.HandleFunc("/check", user.CheckDoc)
-
-	http.ListenAndServe(":8080", r)
+	r.HandleFunc("/follow", user.ToggleFollow)
+	http.ListenAndServe(":8081", r)
 
 }
+
 
 

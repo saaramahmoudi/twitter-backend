@@ -9,6 +9,7 @@ type UserRepository interface {
 	UpdateUser(user * domain.User) (* domain.User, error)
 	EmailExists(email * string) (* bool, error)
 	Save(user * domain.User) (* domain.User, error)
+	GetSaveTransactionTwoUsers(id1 * string, id2 * string, operation func (user1 * domain.User, user2 * domain.User) (* domain.User, * domain.User,  error)) (* domain.User, * domain.User, error)
 }
 
 

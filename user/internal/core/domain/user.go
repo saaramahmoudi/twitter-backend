@@ -42,21 +42,30 @@ func NewUser(Name * string, Email * string, Tag * string, ImageSrc * string) (* 
 	return res, nil
 }
 
-
-func (u *User) followUser(otherUser *User){
-	u.FollowingsId = append(u.FollowingsId, *otherUser.Id)
+func index(s []string, e string) int {
+	for i, a := range s {
+		if a == e {
+			return i
+		}
+	}
+	return -1
 }
 
-func (u *User) unFollowUser(otherUser *User){
-	u.FollowingsId = append(u.FollowingsId, *otherUser.Id)
+func ToggleList(instance string, list * []string){
+	index := index(*list, instance)
+	if index != -1{
+		*list = append((*list)[:index], (*list)[index+1:]...)
+	}else{
+		*list = append(*list, instance)
+	}
+}
+func (u *User) TogglefollowingUser(otherUser *User){
+	ToggleList(*otherUser.Id, &u.FollowingsId)
 }
 
-func (u *User) getFollower(otherUser *User){
-	u.FollowersId = append(u.FollowersId, *otherUser.Id)
-}
 
-func (u *User) removeFollower(otherUser *User){
-	u.FollowersId = append(u.FollowersId, *otherUser.Id)
+func (u *User) ToggleFollower(otherUser *User){
+	ToggleList(*otherUser.Id, &u.FollowersId)
 }
 
 
