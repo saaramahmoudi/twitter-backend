@@ -14,14 +14,13 @@ import (
 type PostService struct {
 	Repo ports.PostRepository
 	Auth user.UserAuth
-	Publisher ports.EventPublisher
 }
 func (u PostService) Get(ctx context.Context, id *  string) (* domain.Post, error){
 	return u.Repo.Get(id)
 }
 
 // Another example of why we need domain service, for things related to buss logic but outside of pure domain and not cross domain
-func (u PostService) Create(ctx context.Context, Text * string, MediaType *  tweet.MediaType) (* domain.PostEvent, error) {
+func (u PostService) Create(ctx context.Context, Text * string, MediaType *  tweet.MediaType) (* domain.Post, error) {
 	email, err := u.Auth.GetEmail(ctx)
 	if err != nil{
 		return nil, err
@@ -46,26 +45,17 @@ func (u PostService) Create(ctx context.Context, Text * string, MediaType *  twe
 	}
 
 
-	currTime := time.Now()
-	postEvent, err := domain.NewPost(id, userInstance.Id, tweetInstance.Id, []string{}, []string{}, &currTime)
+	currTime := time.Now().Unix()
+	post, err := domain.NewPost(id, userInstance.Id, tweetInstance.Id, []string{}, []string{}, &currTime)
 	if err != nil{
 		return nil, err
 	}
 
-	_, err = u.Repo.Save(postEvent.Post)
-	if err != nil{
-		return nil, err
-	}
-
-	_, err = u.Publisher.Publish(postEvent)
-	if err != nil{
-		return nil, err
-	}
-
-	return postEvent, err
+	_, err = u.Repo.Save(post)
+	return post, err
 }
 
-func (u PostService) ToggleLike(ctx context.Context, postId * string) (* domain.PostEvent, error) {
+func (u PostService) ToggleLike(ctx context.Context, postId * string) (* domain.Post, error) {
 	email, err := u.Auth.GetEmail(ctx)
 	if err != nil{
 		return nil, err
@@ -75,25 +65,32 @@ func (u PostService) ToggleLike(ctx context.Context, postId * string) (* domain.
 	if err != nil{
 		return nil, err
 	}
-	post, err := u.Get(ctx, postId)
-	if err != nil{
-		return nil, err
+
+	operation := func (* domain.Post) (* domain.Post, error){
+		post, err := u.Get(ctx, postId)
+		if err != nil{
+			return nil, err
+		}
+
+		currTime := time.Now().Unix()
+		if err != nil {
+			return nil, err
+		}
+
+		pe, err := post.ToggleLikePost(userInstance.Id, &currTime)
+		if err != nil{
+			return nil, err
+		}
+		err = u.Repo.SaveOrDeleteEvent(pe)
+		return post, err
 	}
 
-	currTime := time.Now()
-	pe, err := post.ToggleLikePost(userInstance.Id, &currTime)
-	if err != nil {
-		return nil, err
-	}
-	_, err = u.Publisher.Publish(pe)
-	if err != nil {
-		return nil, err
-	}
-	return pe,nil
+	post, err := u.Repo.GetSaveTransaction(postId, operation)
+	return post, err
 }
 
 
-func (u PostService) ToggleRetweet(ctx context.Context, postId * string) (* domain.PostEvent, error) {
+func (u PostService) ToggleRetweet(ctx context.Context, postId * string) (* domain.Post, error) {
 	email, err := u.Auth.GetEmail(ctx)
 	if err != nil{
 		return nil, err
@@ -103,20 +100,26 @@ func (u PostService) ToggleRetweet(ctx context.Context, postId * string) (* doma
 	if err != nil{
 		return nil, err
 	}
-	post, err := u.Get(ctx, postId)
-	if err != nil{
-		return nil, err
+
+	operation := func (* domain.Post) (* domain.Post, error){
+		post, err := u.Get(ctx, postId)
+		if err != nil{
+			return nil, err
+		}
+
+		currTime := time.Now().Unix()
+		if err != nil {
+			return nil, err
+		}
+		pe, err := post.ToggleRetweetPost(userInstance.Id, &currTime)
+		if err != nil{
+			return nil, err
+		}
+		err = u.Repo.SaveOrDeleteEvent(pe)
+		return post, err
 	}
 
-	currTime := time.Now()
-	pe, err := post.ToggleRetweetPost(userInstance.Id, &currTime)
-	if err != nil {
-		return nil, err
-	}
-	_, err = u.Publisher.Publish(pe)
-	if err != nil {
-		return nil, err
-	}
-	return pe,nil
+	post, err := u.Repo.GetSaveTransaction(postId, operation)
+	return post, err
 }
 

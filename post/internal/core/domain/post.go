@@ -1,46 +1,70 @@
 package domain
 
-import "time"
-
 type Post struct {
 	Id * string `json:"id";firestore:"userId,omitempty"`
 	UserId * string `json:"userId";firestore:"userId,omitempty"`
 	TweetId * string `json:"tweetId";firestore:"tweetId,omitempty"`
 	LikedByUserIds []string `json:"likedByUserIds";firestore:"likedByUserIds,omitempty"`
 	RetweetedByUserIds []string `json:"retweetedByUserIds";firestore:"retweetedByUserIds,omitempty"`
-	MadeAt * time.Time
+	MadeAt * int64
 }
 
 type EventEnum = string
 
 const (
-	PostPublished = "PostPublished"
 	PostLiked = "PostLiked"
 	PostRetweeted = "PostRetweeted"
 )
 
 
 type PostEvent struct {
-	Post * Post
-	EventType EventEnum
-	MadeByUserId * string
-	MadeAt * time.Time
+	Id * string `json:"id"`
+	PostId * string `json:"postId"`
+	EventType EventEnum `json:"eventType"`
+	MadeByUserId * string `json:"madeByUserId"`
+	MadeAt * int64 `json:"madeAt"`
+	IsReversal * bool `json:"isReversal"`
 }
 
 
-func NewPost(Id * string, UserId * string, TweetId * string, LikedByUserIds []string, RetweetedByUserIds []string, MadeAt * time.Time) (* PostEvent, error) {
+func NewPost(Id * string, UserId * string, TweetId * string, LikedByUserIds []string, RetweetedByUserIds []string, MadeAt * int64) (* Post, error) {
+
 	post := Post{Id: Id, UserId: UserId, TweetId: TweetId, LikedByUserIds: LikedByUserIds, RetweetedByUserIds: RetweetedByUserIds, MadeAt: MadeAt}
-	return &PostEvent{Post: &post, EventType: PostPublished, MadeByUserId: UserId, MadeAt: MadeAt}, nil
+	return &post, nil
 }
 
-func (p * Post) ToggleLikePost(userId * string, MadeAt * time.Time) (* PostEvent, error){
-	p.LikedByUserIds = append(p.LikedByUserIds, *userId)
-	return &PostEvent{Post: p, EventType: PostLiked, MadeByUserId:  userId, MadeAt: MadeAt}, nil
+func index(s []string, e string) int {
+	for i, a := range s {
+		if a == e {
+			return i
+		}
+	}
+	return -1
+}
+func (p * Post) ToggleLikePost(userId * string, MadeAt * int64) (* PostEvent, error){
+	index := index(p.LikedByUserIds, *userId)
+	isReversal := true
+	if index != -1{
+		p.LikedByUserIds = append(p.LikedByUserIds[:index], p.LikedByUserIds[index+1:]...)
+		return &PostEvent{PostId: p.Id, EventType: PostLiked, MadeByUserId:  userId, MadeAt: MadeAt, IsReversal: &isReversal}, nil
+	}else{
+		isReversal = false
+		p.LikedByUserIds = append(p.LikedByUserIds, *userId)
+		return &PostEvent{PostId: p.Id, EventType: PostLiked, MadeByUserId:  userId, MadeAt: MadeAt, IsReversal: &isReversal}, nil
+	}
 }
 
-func (p * Post) ToggleRetweetPost(userId * string, MadeAt * time.Time) (* PostEvent, error){
-	p.LikedByUserIds = append(p.LikedByUserIds, *userId)
-	return &PostEvent{Post: p, EventType: PostRetweeted, MadeByUserId:  userId, MadeAt: MadeAt}, nil
+func (p * Post) ToggleRetweetPost(userId * string, MadeAt * int64) (* PostEvent, error){
+	index := index(p.RetweetedByUserIds, *userId)
+	isReversal := true
+	if index != -1{
+		p.RetweetedByUserIds = append(p.RetweetedByUserIds[:index], p.RetweetedByUserIds[index+1:]...)
+		return &PostEvent{PostId: p.Id, EventType: PostLiked, MadeByUserId:  userId, MadeAt: MadeAt, IsReversal: &isReversal}, nil
+	}else{
+		isReversal = false
+		p.RetweetedByUserIds = append(p.RetweetedByUserIds, *userId)
+		return &PostEvent{PostId: p.Id, EventType: PostLiked, MadeByUserId:  userId, MadeAt: MadeAt, IsReversal: &isReversal}, nil
+	}
 }
 
 

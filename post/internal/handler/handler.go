@@ -62,6 +62,40 @@ func (handler * HttpHandler) CreatePost(w http.ResponseWriter, req * http.Reques
 	}
 	json.NewEncoder(w).Encode(post)
 }
+func (handler * HttpHandler) ToggleLikePost(w http.ResponseWriter, req * http.Request){
+
+	reqT := GetPostByIdInput{}
+	err := json.NewDecoder(req.Body).Decode(&reqT)
+	if err != nil {
+		log.Fatal(err)
+	}
+	id := reqT.Id
+	post, err := handler.PostService.ToggleLike(handler.GetAuthContext(w, req), &id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println(err)
+		json.NewEncoder(w).Encode(errors.UserErrors{Message: err.Error()})
+		return
+	}
+	json.NewEncoder(w).Encode(post)
+}
+func (handler * HttpHandler) ToggleRetweetPost(w http.ResponseWriter, req * http.Request){
+
+	reqT := GetPostByIdInput{}
+	err := json.NewDecoder(req.Body).Decode(&reqT)
+	if err != nil {
+		log.Fatal(err)
+	}
+	id := reqT.Id
+	post, err := handler.PostService.ToggleRetweet(handler.GetAuthContext(w, req), &id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println(err)
+		json.NewEncoder(w).Encode(errors.UserErrors{Message: err.Error()})
+		return
+	}
+	json.NewEncoder(w).Encode(post)
+}
 
 
 
