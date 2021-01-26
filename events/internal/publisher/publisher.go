@@ -32,7 +32,7 @@ type PostTopicMessage struct {
 }
 
 func (ep * EventPublisher) PublishPostEvent(event * domain.PostEvent) (* string, error) {
-	t := client.Topic("PostFeed")
+	t := client.Topic("EventFeed")
 	bytes, err := json.Marshal(event)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (ep * EventPublisher) PublishPostEvent(event * domain.PostEvent) (* string,
 
 func (ep * EventPublisher) PublishUserEvent(event * domain.UserEvent) (* string, error) {
 
-	t := client.Topic("PostFeed")
+	t := client.Topic("EventFeed")
 
 	bytes, err := json.Marshal(event)
 	if err != nil {
