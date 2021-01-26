@@ -2,7 +2,6 @@ package domain
 
 import (
 	"errors"
-	"log"
 	"regexp"
 )
 

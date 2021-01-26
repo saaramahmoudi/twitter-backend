@@ -6,6 +6,7 @@ type PostRepository interface {
 	Get(id * string) (*domain.Post, error)
 	Save(post * domain.Post) (* domain.Post, error)
 	GetNewId() (*string, error)
+	GetSaveTransaction(id * string, operation func (*domain.Post) error) (* domain.Post, error)
 }
 
 

@@ -2,8 +2,9 @@ package utils
 
 import "encoding/json"
 // Used to get files on firebase to json form
+// Input needs to be a pointer to the instance
 func TurnStructToMap(input interface{}) (map[string]interface{}, error) {
-	bytes, err := json.Marshal(&input)
+	bytes, err := json.Marshal(input)
 	if err != nil {
 		return nil, err
 	}
