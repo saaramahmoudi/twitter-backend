@@ -87,15 +87,18 @@ func (u PostService) ToggleLike(ctx context.Context, postId * string) (* domain.
 		if err != nil{
 			return nil, err
 		}
-		err = u.Repo.SaveOrDeleteEvent(pe)
 		//This is just in case we manually delete an event
-		if err != nil &&  err.Error() == ports.NoEventFound {
-			err = nil
-		}
 		return post, nil
 	}
 
 	_, err = u.Repo.GetSaveTransaction(postId, operation)
+	if err != nil{
+		return nil, err
+	}
+	err = u.Repo.SaveOrDeleteEvent(pe)
+	if err != nil &&  err.Error() == ports.NoEventFound {
+		err = nil
+	}
 	return pe, err
 }
 
@@ -125,16 +128,19 @@ func (u PostService) ToggleRetweet(ctx context.Context, postId * string) (* doma
 		if err != nil{
 			return nil, err
 		}
-		err = u.Repo.SaveOrDeleteEvent(pe)
-		//This is just in case we manually delete an event
-		if err != nil && err.Error() == ports.NoEventFound {
-			err = nil
-		}
-
 		return post, err
 	}
 
 	_, err = u.Repo.GetSaveTransaction(postId, operation)
+	if err != nil{
+		return nil, err
+	}
+	err = u.Repo.SaveOrDeleteEvent(pe)
+	//This is just in case we manually delete an event
+	if err != nil && err.Error() == ports.NoEventFound {
+		err = nil
+	}
+
 	return pe, err
 }
 
