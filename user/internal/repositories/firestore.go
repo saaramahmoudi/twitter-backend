@@ -138,12 +138,12 @@ func (repo UserFirestore) GetSaveTransactionTwoUsers(id1 * string, id2 * string,
 		if err != nil {
 			return err
 		}
-		err = saveTransaction(user1, ref1, tx)
+		err = saveTransaction(user2, ref2, tx)
 		if err != nil {
 			return err
 		}
 
-		return saveTransaction(user2, ref2, tx)
+		return saveTransaction(user1, ref1, tx)
 	})
 	return user1, user2, err
 }

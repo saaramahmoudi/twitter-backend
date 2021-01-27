@@ -98,15 +98,20 @@ func (u UserService) ToggleFollowUser(ctx context.Context, secondUserId * string
 	if err != nil {
 		return err
 	}
-
+	if * user.Id == * secondUserId{
+		return errors.New("User can not follow themselves");
+	}
 	operation := func (user1 * domain.User, user2 * domain.User) (* domain.User, * domain.User,  error) {
 		user1.TogglefollowingUser(user2)
-		log.Println(user2.FollowersId)
 		user2.ToggleFollower(user1)
-		log.Println(user2.FollowersId)
 		return user1, user2, nil
 	}
-	_, _, err  = u.Repo.GetSaveTransactionTwoUsers(user.Id, secondUserId, operation)
+	user1, user2, err  := u.Repo.GetSaveTransactionTwoUsers(user.Id, secondUserId, operation)
+
+	if err == nil{
+		log.Println(*user1.Id, user1.FollowingsId)
+		log.Println(*user2.Id, user2.FollowersId)
+	}
 	return err
 }
 
