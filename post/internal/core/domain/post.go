@@ -6,7 +6,7 @@ type Post struct {
 	TweetId * string `json:"tweetId";firestore:"tweetId,omitempty"`
 	LikedByUserIds []string `json:"likedByUserIds";firestore:"likedByUserIds,omitempty"`
 	RetweetedByUserIds []string `json:"retweetedByUserIds";firestore:"retweetedByUserIds,omitempty"`
-	MadeAt * int64
+	MadeAt * int64 `json:"madeAt";firestore:"madeAt,omitempty"`
 }
 
 type EventEnum = string
@@ -14,6 +14,7 @@ type EventEnum = string
 const (
 	PostLiked = "PostLiked"
 	PostRetweeted = "PostRetweeted"
+	PostCreated = "PostCreated"
 )
 
 
@@ -59,11 +60,11 @@ func (p * Post) ToggleRetweetPost(userId * string, MadeAt * int64) (* PostEvent,
 	isReversal := true
 	if index != -1{
 		p.RetweetedByUserIds = append(p.RetweetedByUserIds[:index], p.RetweetedByUserIds[index+1:]...)
-		return &PostEvent{PostId: p.Id, EventType: PostLiked, MadeByUserId:  userId, MadeAt: MadeAt, IsReversal: &isReversal}, nil
+		return &PostEvent{PostId: p.Id, EventType: PostRetweeted, MadeByUserId:  userId, MadeAt: MadeAt, IsReversal: &isReversal}, nil
 	}else{
 		isReversal = false
 		p.RetweetedByUserIds = append(p.RetweetedByUserIds, *userId)
-		return &PostEvent{PostId: p.Id, EventType: PostLiked, MadeByUserId:  userId, MadeAt: MadeAt, IsReversal: &isReversal}, nil
+		return &PostEvent{PostId: p.Id, EventType: PostRetweeted, MadeByUserId:  userId, MadeAt: MadeAt, IsReversal: &isReversal}, nil
 	}
 }
 

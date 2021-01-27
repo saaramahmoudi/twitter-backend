@@ -6,6 +6,7 @@ import (
 	"errors"
 	firebase "firebase.google.com/go"
 	"github.com/saaramahmoudi/twitter-backend/post/internal/core/domain"
+	"github.com/saaramahmoudi/twitter-backend/post/internal/core/ports"
 	"github.com/saaramahmoudi/twitter-backend/utils"
 	"google.golang.org/api/iterator"
 	"log"
@@ -84,7 +85,7 @@ func (repo PostFirestore) GetEventId (event * domain.PostEvent) (* string, error
 		}
 		return event.Id, nil
 	}
-	return nil, errors.New("No event found")
+	return nil, errors.New(ports.NoEventFound)
 }
 func (repo PostFirestore) SaveOrDeleteEvent(event * domain.PostEvent) error {
 	if *event.IsReversal {

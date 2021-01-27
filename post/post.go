@@ -9,4 +9,4 @@ type PostEvent = domain.PostEvent
 type EventEnum = domain.EventEnum
 const PostLiked = domain.PostLiked
 const PostRetweeted = domain.PostRetweeted
-
+const PostCreated = domain.PostCreated

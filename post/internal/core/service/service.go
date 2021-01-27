@@ -50,12 +50,17 @@ func (u PostService) Create(ctx context.Context, Text * string, MediaType *  twe
 	if err != nil{
 		return nil, err
 	}
-
 	_, err = u.Repo.Save(post)
+	if err != nil {
+		return nil, err
+	}
+	isReversal := false
+	pe := &domain.PostEvent{PostId: post.Id, EventType: domain.PostCreated, MadeByUserId:  userInstance.Id, MadeAt: &currTime, IsReversal: &isReversal}
+	err = u.Repo.SaveOrDeleteEvent(pe)
 	return post, err
 }
 
-func (u PostService) ToggleLike(ctx context.Context, postId * string) (* domain.Post, error) {
+func (u PostService) ToggleLike(ctx context.Context, postId * string) (* domain.PostEvent, error) {
 	email, err := u.Auth.GetEmail(ctx)
 	if err != nil{
 		return nil, err
@@ -65,6 +70,7 @@ func (u PostService) ToggleLike(ctx context.Context, postId * string) (* domain.
 	if err != nil{
 		return nil, err
 	}
+	var pe  * domain.PostEvent
 
 	operation := func (* domain.Post) (* domain.Post, error){
 		post, err := u.Get(ctx, postId)
@@ -77,20 +83,24 @@ func (u PostService) ToggleLike(ctx context.Context, postId * string) (* domain.
 			return nil, err
 		}
 
-		pe, err := post.ToggleLikePost(userInstance.Id, &currTime)
+		pe, err = post.ToggleLikePost(userInstance.Id, &currTime)
 		if err != nil{
 			return nil, err
 		}
 		err = u.Repo.SaveOrDeleteEvent(pe)
-		return post, err
+		//This is just in case we manually delete an event
+		if err != nil &&  err.Error() == ports.NoEventFound {
+			err = nil
+		}
+		return post, nil
 	}
 
-	post, err := u.Repo.GetSaveTransaction(postId, operation)
-	return post, err
+	_, err = u.Repo.GetSaveTransaction(postId, operation)
+	return pe, err
 }
 
 
-func (u PostService) ToggleRetweet(ctx context.Context, postId * string) (* domain.Post, error) {
+func (u PostService) ToggleRetweet(ctx context.Context, postId * string) (* domain.PostEvent, error) {
 	email, err := u.Auth.GetEmail(ctx)
 	if err != nil{
 		return nil, err
@@ -100,7 +110,7 @@ func (u PostService) ToggleRetweet(ctx context.Context, postId * string) (* doma
 	if err != nil{
 		return nil, err
 	}
-
+	var pe  * domain.PostEvent
 	operation := func (* domain.Post) (* domain.Post, error){
 		post, err := u.Get(ctx, postId)
 		if err != nil{
@@ -111,15 +121,20 @@ func (u PostService) ToggleRetweet(ctx context.Context, postId * string) (* doma
 		if err != nil {
 			return nil, err
 		}
-		pe, err := post.ToggleRetweetPost(userInstance.Id, &currTime)
+		pe, err = post.ToggleRetweetPost(userInstance.Id, &currTime)
 		if err != nil{
 			return nil, err
 		}
 		err = u.Repo.SaveOrDeleteEvent(pe)
+		//This is just in case we manually delete an event
+		if err != nil && err.Error() == ports.NoEventFound {
+			err = nil
+		}
+
 		return post, err
 	}
 
-	post, err := u.Repo.GetSaveTransaction(postId, operation)
-	return post, err
+	_, err = u.Repo.GetSaveTransaction(postId, operation)
+	return pe, err
 }
 
